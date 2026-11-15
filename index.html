@@ -1,0 +1,183 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brainrot World</title>
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;padding:20px;
+ background:linear-gradient(145deg,#160b36,#102d67);
+ color:white;font-family:Arial,sans-serif;
+ text-align:center;
+}
+h1{color:#c9a5ff;font-size:32px}
+.coins{
+ background:#30205e;padding:16px;
+ border-radius:18px;font-size:23px;
+ margin:20px auto;max-width:300px;
+}
+.menu{
+ display:grid;grid-template-columns:1fr 1fr;
+ gap:12px;max-width:500px;margin:auto;
+}
+button{
+ border:1px solid #9874ff;
+ border-radius:16px;padding:20px 8px;
+ background:linear-gradient(135deg,#6036b7,#1767b9);
+ color:white;font-size:17px;font-weight:bold;
+ cursor:pointer;
+}
+button:active{transform:scale(.96)}
+.panel{
+ background:#24184b;padding:20px;
+ border-radius:20px;margin:20px auto;
+ max-width:500px;
+}
+.hidden{display:none}
+.back{margin-top:15px}
+.small{font-size:13px;color:#cbb9ff}
+</style>
+</head>
+<body>
+
+<h1>🧠 BRAINROT WORLD</h1>
+<p>Collect Brainrots. Become Rich!</p>
+
+<div class="coins">
+🪙 <span id="coins">500</span> COINS
+</div>
+
+<div class="menu" id="menu">
+<button onclick="show('upgrade')">⬆️ UPGRADE</button>
+<button onclick="show('lucky')">🎁 LUCKY BOX</button>
+<button onclick="show('colors')">🎨 COLORS</button>
+<button onclick="show('games')">🎮 MINI GAMES</button>
+<button onclick="show('tasks')">🎯 TASKS</button>
+<button onclick="daily()">🎁 DAILY GIFT</button>
+</div>
+
+<div class="panel hidden" id="upgrade">
+<h2>⬆️ Upgrade</h2>
+<p>Level: <span id="level">1</span></p>
+<p>Upgrade cost: <span id="cost">100</span> coins</p>
+<button onclick="upgrade()">BUY UPGRADE</button>
+<button class="back" onclick="home()">BACK</button>
+</div>
+
+<div class="panel hidden" id="lucky">
+<h2>🎁 Lucky Box</h2>
+<p>Open a box for 100 coins!</p>
+<button onclick="lucky()">OPEN BOX</button>
+<p id="luckyResult"></p>
+<button class="back" onclick="home()">BACK</button>
+</div>
+
+<div class="panel hidden" id="colors">
+<h2>🎨 Choose your color</h2>
+<button onclick="color('#160b36')">💜 Purple</button>
+<button onclick="color('#102d67')">💙 Blue</button>
+<button onclick="color('#651b48')">❤️ Pink</button>
+<button class="back" onclick="home()">BACK</button>
+</div>
+
+<div class="panel hidden" id="games">
+<h2>🎮 Guess the number</h2>
+<p>Guess a number from 1 to 5!</p>
+<input id="guess" type="number" min="1" max="5"
+style="padding:12px;width:100px;border-radius:10px">
+<button onclick="play()">GUESS</button>
+<p id="gameResult"></p>
+<button class="back" onclick="home()">BACK</button>
+</div>
+
+<div class="panel hidden" id="tasks">
+<h2>🎯 Tasks</h2>
+<p>Get 50 coins for completing a task!</p>
+<button id="taskButton" onclick="task()">CLAIM 50 COINS</button>
+<p id="taskResult"></p>
+<button class="back" onclick="home()">BACK</button>
+</div>
+
+<p class="small">BRAINROT WORLD © 2026</p>
+
+<script>
+let coins=Number(localStorage.coins)||500;
+let level=Number(localStorage.level)||1;
+let done=localStorage.taskDone==="true";
+
+function save(){
+ localStorage.coins=coins;
+ localStorage.level=level;
+ document.getElementById("coins").textContent=coins;
+ document.getElementById("level").textContent=level;
+ document.getElementById("cost").textContent=level*100;
+}
+function show(id){
+ document.getElementById("menu").classList.add("hidden");
+ document.querySelectorAll(".panel").forEach(x=>x.classList.add("hidden"));
+ document.getElementById(id).classList.remove("hidden");
+}
+function home(){
+ document.getElementById("menu").classList.remove("hidden");
+ document.querySelectorAll(".panel").forEach(x=>x.classList.add("hidden"));
+}
+function upgrade(){
+ let cost=level*100;
+ if(coins>=cost){
+ coins-=cost;level++;save();
+ alert("Upgrade successful!");
+ }else alert("Not enough coins!");
+}
+function lucky(){
+ if(coins<100){alert("Not enough coins!");return;}
+ coins-=100;
+ let prize=Math.floor(Math.random()*301);
+ coins+=prize;save();
+ document.getElementById("luckyResult").textContent=
+ "🎉 You won "+prize+" coins!";
+}
+function color(c){document.body.style.background=c}
+function play(){
+ let n=Number(document.getElementById("guess").value);
+ let answer=Math.floor(Math.random()*5)+1;
+ if(n<1||n>5){
+ document.getElementById("gameResult").textContent="Choose 1 to 5!";
+ return;
+ }
+ if(n===answer){
+ coins+=100;
+ document.getElementById("gameResult").textContent="🎉 Correct! +100 coins!";
+ }else{
+ document.getElementById("gameResult").textContent="Wrong! Number was "+answer;
+ }
+ save();
+}
+function task(){
+ if(done){alert("Task already completed!");return;}
+ coins+=50;done=true;
+ localStorage.taskDone="true";
+ document.getElementById("taskButton").disabled=true;
+ document.getElementById("taskResult").textContent="✅ +50 coins!";
+ save();
+}
+function daily(){
+ let today=new Date().toDateString();
+ if(localStorage.daily===today){
+ alert("Come back tomorrow!");
+ return;
+ }
+ coins+=100;
+ localStorage.daily=today;
+ save();alert("🎁 Daily gift: +100 coins!");
+}
+if(done){
+ document.getElementById("taskButton").disabled=true;
+ document.getElementById("taskButton").textContent="COMPLETED";
+}
+save();
+</script>
+</body>
+</html>
